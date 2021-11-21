@@ -1,208 +1,26 @@
-from abc import ABC
-import random
+import art
+from dal import record_results
+from model import AdditionQuestion, DivisionQuestion, GameResults, MultiplicationQuestion, \
+    Question, QuestionResult, SubtractionQuestion
 import time
-from typing import List, Optional
+from typing import List
 
 
 def current_milli_time():
     return round(time.time() * 1000)
 
 
-class Difficulty:
-    def __init__(self,
-                 x_min: int,
-                 x_max: int,
-                 y_min: int,
-                 y_max: int,
-                 point_modifier: int = 1):
-        self.x_min = x_min
-        self.x_max = x_max
-        self.y_min = y_min
-        self.y_max = y_max
-        self.point_modifier = point_modifier
+__player_1__: str = 'Lauren'
+__player_2__: str = 'Carter'
+__player_3__: str = 'James'
 
 
-class Question(ABC):
-    def __init__(self, difficulty):
-        self.__user_provided_answer = None
-        self.__answer = None
-        self.__symbol = None
+__ADDITION__: str = 'Addition'
+__SUBTRACTION__: str = 'Subtraction'
+__MULTIPLICATION__: str = 'Multiplication'
+__DIVISION__: str = 'Division'
 
-        # Grab the difficulty from the list and create the numbers
-        self.__chosen_difficulty: Difficulty = self.difficulties[difficulty - 1]
-        numbers: (int, int) = self.get_numbers(self.__chosen_difficulty)
-
-        self.__number1: int = numbers[0]
-        self.__number2: int = numbers[1]
-
-    def get_numbers(self, d: Difficulty) -> (int, int):
-        number1: int = random.randint(d.x_min, d.x_max)
-        number2: int = random.randint(d.y_min, d.y_max)
-
-        return number1, number2
-
-    @property
-    def chosen_difficulty(self) -> Difficulty:
-        return self.__chosen_difficulty
-
-    @chosen_difficulty.setter
-    def chosen_difficulty(self, value: Difficulty):
-        self.__chosen_difficulty = value
-
-    @property
-    def difficulties(self) -> Optional[List[Difficulty]]:
-        return self.__difficulties
-
-    @difficulties.setter
-    def difficulties(self, value: Optional[List[Difficulty]]):
-        self.__difficulties = value
-
-    @property
-    def answer(self):
-        return self.__answer
-
-    @answer.setter
-    def answer(self, value):
-        self.__answer = value
-
-    @property
-    def user_provided_answer(self):
-        return self.__user_provided_answer
-
-    @user_provided_answer.setter
-    def user_provided_answer(self, value):
-        self.__user_provided_answer = value
-
-    @property
-    def symbol(self):
-        return self.__symbol
-
-    @symbol.setter
-    def symbol(self, value):
-        self.__symbol = value
-
-    @property
-    def number1(self):
-        return self.__number1
-
-    @number1.setter
-    def number1(self, value):
-        self.__number1 = value
-
-    @property
-    def number2(self):
-        return self.__number2
-
-    @number2.setter
-    def number2(self, value):
-        self.__number2 = value
-
-    def print_problem(self):
-        print('  {}'.format(self.number1))
-        print('{} {}'.format(self.symbol, self.number2))
-
-    def is_correct(self):
-        return self.answer == self.user_provided_answer
-
-
-class AdditionQuestion(Question):
-    @property
-    def answer(self):
-        return self.number1 + self.number2
-
-    @property
-    def symbol(self):
-        return '+'
-
-    @property
-    def difficulties(self) -> Optional[List[Difficulty]]:
-        return [
-            Difficulty(1, 20, 1, 20),
-            Difficulty(1, 100, 1, 200, 2),
-            Difficulty(1, 500, 1, 500, 4),
-            Difficulty(1, 1000, 100, 1000, 6)
-        ]
-
-
-class MultiplicationQuestion(Question):
-    @property
-    def answer(self):
-        return self.number1 * self.number2
-
-    @property
-    def symbol(self):
-        return 'x'
-
-    @property
-    def difficulties(self) -> Optional[List[Difficulty]]:
-        return [
-            Difficulty(1, 10, 1, 10, 2),
-            Difficulty(1, 12, 1, 12, 3),
-            Difficulty(1, 15, 1, 15, 5),
-            Difficulty(1, 20, 1, 20, 7)
-        ]
-
-
-class SubtractionQuestion(Question):
-    @property
-    def answer(self):
-        return self.number1 - self.number2
-
-    @property
-    def symbol(self):
-        return '-'
-
-    @property
-    def difficulties(self) -> Optional[List[Difficulty]]:
-        return [
-            Difficulty(1, 20, 1, 20),
-            Difficulty(1, 100, 1, 100, 2),
-            Difficulty(1, 1000, 1, 100, 4),
-            Difficulty(1, 1000, 1, 1000, 6)
-        ]
-
-    def get_numbers(self, d: Difficulty) -> (int, int):
-        number1: int = random.randint(d.x_min, d.x_max)
-        number2: int = random.randint(d.y_min, d.y_max)
-
-        if number1 > number2:
-            return number1, number2
-        else:
-            return self.get_numbers(d)
-
-
-class DivisionQuestion(Question):
-    @property
-    def answer(self):
-        return int(self.number1 / self.number2)
-
-    @property
-    def symbol(self):
-        return '÷'
-
-    @property
-    def difficulties(self) -> Optional[List[Difficulty]]:
-        return [
-            Difficulty(1, 10, 1, 10, 2),
-            Difficulty(1, 12, 1, 12, 4),
-            Difficulty(1, 15, 1, 15, 6),
-            Difficulty(1, 20, 1, 20, 8)
-        ]
-
-    def get_numbers(self, d: Difficulty) -> (int, int):
-        number1: int = random.randint(d.x_min, d.x_max)
-        number2: int = random.randint(d.y_min, d.y_max)
-        denominator = number1 * number2
-
-        return denominator, number1
-
-
-__ADDITION__ = 'Addition'
-__SUBTRACTION__ = 'Subtraction'
-__MULTIPLICATION__ = 'Multiplication'
-__DIVISION__ = 'Division'
-
-__NUM_SECONDS__ = 10
+__NUM_SECONDS__ = 60
 
 
 class Game:
@@ -211,11 +29,38 @@ class Game:
         self.difficulty = None
         self.questions = []
         self.score = None
+        self.player = Game.pick_player()
 
     @staticmethod
     def print_new_screen():
-        for j in range(1, 100):
-            print('')
+        newlines = ''
+        if newlines == '':
+            for j in range(1, 100):
+                newlines += '\n'
+
+        print(newlines)
+
+    @staticmethod
+    def pick_player() -> str:
+        Game.print_new_screen()
+        print('Who is playing right now?')
+        print('1) {}'.format(__player_1__))
+        print('2) {}'.format(__player_2__))
+        player_str = input('Type the number for the player and hit enter: ')
+
+        try:
+            player = int(player_str)
+            if player < 1 or player > 3:
+                return Game.pick_player()
+
+            if player == 1:
+                return __player_1__.lower()
+            elif player == 2:
+                return __player_2__.lower()
+            elif player == 3:
+                return __player_3__.lower()
+        except:
+            return Game.pick_player()
 
     def choose_game(self):
         Game.print_new_screen()
@@ -281,7 +126,7 @@ class Game:
         for j in range(0, len(correct_questions)):
             q = correct_questions[j]
             current_question_worth = (j + 1) * q.chosen_difficulty.point_modifier
-            print('correct question {} was worth {} points'.format(j + 1, current_question_worth))
+            #print('correct question {} was worth {} points'.format(j + 1, current_question_worth))
             total_worth += current_question_worth
 
         return total_worth
@@ -303,9 +148,21 @@ class Game:
     def play_game(self):
         start_time = current_milli_time()
         questions_asked = []
+        correct_questions = 0
+
+        # get the art for this game
+        the_art: List[str] = art.get_art_for_game()
 
         while current_milli_time() < start_time + (__NUM_SECONDS__ * 1000):
             Game.print_new_screen()
+
+            # Print the art if appropriate
+            if correct_questions > 0:
+                if correct_questions < len(the_art):
+                    print('{}\n\n'.format(the_art[correct_questions]))
+                else:
+                    print('{}\n\n'.format(the_art[len(the_art) - 1]))
+
             if len(questions_asked) > 0:
                 Game.print_single_answer_correctness(questions_asked)
 
@@ -318,6 +175,8 @@ class Game:
 
             q.user_provided_answer = Game.get_user_answer()
             questions_asked.append(q)
+            if q.is_correct():
+                correct_questions += 1
 
         Game.print_single_answer_correctness(questions_asked)
 
@@ -337,13 +196,43 @@ class Game:
             len(correct_questions), len(incorrect_questions), __NUM_SECONDS__))
         Game.print_wrong_questions(incorrect_questions)
 
-        print('\n\nThat\'s worth {} points!'.format(Game.calculate_score(correct_questions)))
+        calculated_score = Game.calculate_score(correct_questions)
+        print('\n\nThat\'s worth {} points!'.format(calculated_score))
+
+        # Convert the questions into the data storage model
+        storage_corrects: List[QuestionResult] = \
+            [GameResults.convert_question_for_storage(q, self.difficulty) for q in correct_questions]
+        storage_incorrects: List[QuestionResult] = \
+            [GameResults.convert_question_for_storage(q, self.difficulty) for q in incorrect_questions]
+
+        game_results = GameResults(
+            storage_corrects,
+            storage_incorrects,
+            self.game,
+            self.difficulty,
+            __NUM_SECONDS__,
+            calculated_score
+        )
+        record_results(self.player, game_results)
+
+
+def play_game(g: Game):
+    """
+    A simple method for executing gameplay. It keeps the player selection the same, but allows for selecting
+    different games
+    """
+    playing_game = True
+    while playing_game:
+        g.choose_game()
+        g.choose_difficulty()
+        g.play_game()
+
+        play_another = input('Would you like to play again? Enter \'y\' for yes or \'n\' for no: ')
+        if play_another.lower() != 'y':
+            playing_game = False
 
 
 if __name__ == '__main__':
-
     g = Game()
-    g.choose_game()
-    g.choose_difficulty()
-    g.play_game()
+    play_game(g)
 
